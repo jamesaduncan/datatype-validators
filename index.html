@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validator Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-input {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            align-items: center;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .result.valid {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .result.invalid {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .result.error {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .test-cases {
+            margin-top: 20px;
+        }
+        .test-case {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .test-case.pass {
+            background: #e7f5e7;
+        }
+        .test-case.fail {
+            background: #fce7e7;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8d7da;
+            border-radius: 4px;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>WASM Validator Test</h1>
+    
+    <div class="test-section">
+        <h2>Text Validator - Interactive Test</h2>
+        <div class="test-input">
+            <input type="text" id="testInput" placeholder="Enter text to validate...">
+            <button onclick="testTextValidation()">Validate</button>
+            <button onclick="testTextAssertion()">Assert</button>
+        </div>
+        <div id="textResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>URL Validator - Interactive Test</h2>
+        <div class="test-input">
+            <input type="text" id="urlInput" placeholder="Enter URL to validate...">
+            <button onclick="testUrlValidation()">Validate</button>
+            <button onclick="testUrlAssertion()">Assert</button>
+        </div>
+        <div id="urlResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Integer Validator - Interactive Test</h2>
+        <div class="test-input">
+            <input type="text" id="integerInput" placeholder="Enter integer to validate...">
+            <button onclick="testIntegerValidation()">Validate</button>
+            <button onclick="testIntegerAssertion()">Assert</button>
+        </div>
+        <div id="integerResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>FloatingPoint Validator - Interactive Test</h2>
+        <div class="test-input">
+            <input type="text" id="floatInput" placeholder="Enter floating point number to validate...">
+            <button onclick="testFloatValidation()">Validate</button>
+            <button onclick="testFloatAssertion()">Assert</button>
+        </div>
+        <div id="floatResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Boolean Validator - Interactive Test</h2>
+        <div class="test-input">
+            <input type="text" id="booleanInput" placeholder="Enter boolean value to validate...">
+            <button onclick="testBooleanValidation()">Validate</button>
+            <button onclick="testBooleanAssertion()">Assert</button>
+        </div>
+        <div id="booleanResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>DateTime Validator - Interactive Test</h2>
+        <div class="test-input">
+            <input type="text" id="datetimeInput" placeholder="Enter ISO8601 datetime to validate...">
+            <button onclick="testDateTimeValidation()">Validate</button>
+            <button onclick="testDateTimeAssertion()">Assert</button>
+        </div>
+        <div id="datetimeResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Date Validator - Interactive Test</h2>
+        <div class="test-input">
+            <input type="text" id="dateInput" placeholder="Enter ISO8601 date (YYYY-MM-DD) to validate...">
+            <button onclick="testDateValidation()">Validate</button>
+            <button onclick="testDateAssertion()">Assert</button>
+        </div>
+        <div id="dateResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Time Validator - Interactive Test</h2>
+        <div class="test-input">
+            <input type="text" id="timeInput" placeholder="Enter ISO8601 time (HH:MM:SS) to validate...">
+            <button onclick="testTimeValidation()">Validate</button>
+            <button onclick="testTimeAssertion()">Assert</button>
+        </div>
+        <div id="timeResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Automatic Test Cases</h2>
+        <div id="loading" class="loading">Loading WASM modules...</div>
+        <div id="testCases" class="test-cases" style="display: none;"></div>
+        <button onclick="runAllTests()" style="margin-top: 10px;">Run All Tests</button>
+    </div>
+
+    <script type="module">
+        import { Validator, ValidationError } from './Validator/index.mjs';
+        
+        // Create validator instances
+        const textValidator = new Validator('./Text/text-validator/target/wasm32-unknown-unknown/release/text_validator.wasm');
+        const urlValidator = new Validator('./URL/url-validator/target/wasm32-unknown-unknown/release/url_validator.wasm');
+        const integerValidator = new Validator('./Number/integer-validator/target/wasm32-unknown-unknown/release/integer_validator.wasm');
+        const floatValidator = new Validator('./Number/floatingpoint-validator/target/wasm32-unknown-unknown/release/floatingpoint_validator.wasm');
+        const booleanValidator = new Validator('./Boolean/boolean-validator/target/wasm32-unknown-unknown/release/boolean_validator.wasm');
+        const datetimeValidator = new Validator('./DateTime/datetime-validator/target/wasm32-unknown-unknown/release/datetime_validator.wasm');
+        const dateValidator = new Validator('./DateTime/date-validator/target/wasm32-unknown-unknown/release/date_validator.wasm');
+        const timeValidator = new Validator('./DateTime/time-validator/target/wasm32-unknown-unknown/release/time_validator.wasm');
+        
+        // Make functions available globally for onclick handlers
+        window.textValidator = textValidator;
+        window.urlValidator = urlValidator;
+        window.integerValidator = integerValidator;
+        window.floatValidator = floatValidator;
+        window.booleanValidator = booleanValidator;
+        window.datetimeValidator = datetimeValidator;
+        window.dateValidator = dateValidator;
+        window.timeValidator = timeValidator;
+        window.ValidationError = ValidationError;
+        
+        // Text Validator functions
+        window.testTextValidation = async function() {
+            const input = document.getElementById('testInput').value;
+            const resultDiv = document.getElementById('textResult');
+            
+            try {
+                const isValid = await textValidator.validate(input);
+                resultDiv.className = `result ${isValid ? 'valid' : 'invalid'}`;
+                resultDiv.textContent = isValid 
+                    ? `✅ Valid text: "${input}"` 
+                    : `❌ Invalid text: "${input}"`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                console.error('Validation error:', error);
+            }
+        };
+        
+        window.testTextAssertion = async function() {
+            const input = document.getElementById('testInput').value;
+            const resultDiv = document.getElementById('textResult');
+            
+            try {
+                await textValidator.assert(input);
+                resultDiv.className = 'result valid';
+                resultDiv.textContent = `✅ Text assertion passed: "${input}"`;
+            } catch (error) {
+                if (error instanceof ValidationError) {
+                    resultDiv.className = 'result invalid';
+                    resultDiv.textContent = `❌ ${error.message}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                    console.error('Assertion error:', error);
+                }
+            }
+        };
+        
+        // URL Validator functions
+        window.testUrlValidation = async function() {
+            const input = document.getElementById('urlInput').value;
+            const resultDiv = document.getElementById('urlResult');
+            
+            try {
+                const isValid = await urlValidator.validate(input);
+                resultDiv.className = `result ${isValid ? 'valid' : 'invalid'}`;
+                resultDiv.textContent = isValid 
+                    ? `✅ Valid URL: "${input}"` 
+                    : `❌ Invalid URL: "${input}"`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                console.error('Validation error:', error);
+            }
+        };
+        
+        window.testUrlAssertion = async function() {
+            const input = document.getElementById('urlInput').value;
+            const resultDiv = document.getElementById('urlResult');
+            
+            try {
+                await urlValidator.assert(input);
+                resultDiv.className = 'result valid';
+                resultDiv.textContent = `✅ URL assertion passed: "${input}"`;
+            } catch (error) {
+                if (error instanceof ValidationError) {
+                    resultDiv.className = 'result invalid';
+                    resultDiv.textContent = `❌ ${error.message}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                    console.error('Assertion error:', error);
+                }
+            }
+        };
+        
+        // Integer Validator functions
+        window.testIntegerValidation = async function() {
+            const input = document.getElementById('integerInput').value;
+            const resultDiv = document.getElementById('integerResult');
+            
+            try {
+                // Try parsing as number first, then as string
+                let value;
+                const trimmed = input.trim();
+                
+                // Try to parse as number
+                const asNumber = Number(trimmed);
+                if (!isNaN(asNumber) && Number.isInteger(asNumber)) {
+                    value = asNumber;
+                } else {
+                    // Use as string
+                    value = input;
+                }
+                
+                const isValid = await integerValidator.validate(value);
+                resultDiv.className = `result ${isValid ? 'valid' : 'invalid'}`;
+                resultDiv.textContent = isValid 
+                    ? `✅ Valid integer: "${input}"` 
+                    : `❌ Invalid integer: "${input}"`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                console.error('Validation error:', error);
+            }
+        };
+        
+        window.testIntegerAssertion = async function() {
+            const input = document.getElementById('integerInput').value;
+            const resultDiv = document.getElementById('integerResult');
+            
+            try {
+                // Try parsing as number first, then as string
+                let value;
+                const trimmed = input.trim();
+                
+                // Try to parse as number
+                const asNumber = Number(trimmed);
+                if (!isNaN(asNumber) && Number.isInteger(asNumber)) {
+                    value = asNumber;
+                } else {
+                    // Use as string
+                    value = input;
+                }
+                
+                await integerValidator.assert(value);
+                resultDiv.className = 'result valid';
+                resultDiv.textContent = `✅ Integer assertion passed: "${input}"`;
+            } catch (error) {
+                if (error instanceof ValidationError) {
+                    resultDiv.className = 'result invalid';
+                    resultDiv.textContent = `❌ ${error.message}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                    console.error('Assertion error:', error);
+                }
+            }
+        };
+        
+        // FloatingPoint Validator functions
+        window.testFloatValidation = async function() {
+            const input = document.getElementById('floatInput').value;
+            const resultDiv = document.getElementById('floatResult');
+            
+            try {
+                // Try parsing as number first, then as string
+                let value;
+                const trimmed = input.trim();
+                
+                // Try to parse as number
+                const asNumber = Number(trimmed);
+                if (!isNaN(asNumber) && isFinite(asNumber)) {
+                    value = asNumber;
+                } else {
+                    // Use as string
+                    value = input;
+                }
+                
+                const isValid = await floatValidator.validate(value);
+                resultDiv.className = `result ${isValid ? 'valid' : 'invalid'}`;
+                resultDiv.textContent = isValid 
+                    ? `✅ Valid float: "${input}"` 
+                    : `❌ Invalid float: "${input}"`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                console.error('Validation error:', error);
+            }
+        };
+        
+        window.testFloatAssertion = async function() {
+            const input = document.getElementById('floatInput').value;
+            const resultDiv = document.getElementById('floatResult');
+            
+            try {
+                // Try parsing as number first, then as string
+                let value;
+                const trimmed = input.trim();
+                
+                // Try to parse as number
+                const asNumber = Number(trimmed);
+                if (!isNaN(asNumber) && isFinite(asNumber)) {
+                    value = asNumber;
+                } else {
+                    // Use as string
+                    value = input;
+                }
+                
+                await floatValidator.assert(value);
+                resultDiv.className = 'result valid';
+                resultDiv.textContent = `✅ Float assertion passed: "${input}"`;
+            } catch (error) {
+                if (error instanceof ValidationError) {
+                    resultDiv.className = 'result invalid';
+                    resultDiv.textContent = `❌ ${error.message}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                    console.error('Assertion error:', error);
+                }
+            }
+        };
+        
+        // Boolean Validator functions
+        window.testBooleanValidation = async function() {
+            const input = document.getElementById('booleanInput').value;
+            const resultDiv = document.getElementById('booleanResult');
+            
+            try {
+                // Check for direct boolean values
+                let value;
+                const trimmed = input.trim().toLowerCase();
+                
+                if (trimmed === 'true' || trimmed === 'false') {
+                    value = trimmed === 'true';
+                } else {
+                    value = input;
+                }
+                
+                const isValid = await booleanValidator.validate(value);
+                resultDiv.className = `result ${isValid ? 'valid' : 'invalid'}`;
+                resultDiv.textContent = isValid 
+                    ? `✅ Valid boolean: "${input}"` 
+                    : `❌ Invalid boolean: "${input}"`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                console.error('Validation error:', error);
+            }
+        };
+        
+        window.testBooleanAssertion = async function() {
+            const input = document.getElementById('booleanInput').value;
+            const resultDiv = document.getElementById('booleanResult');
+            
+            try {
+                // Check for direct boolean values
+                let value;
+                const trimmed = input.trim().toLowerCase();
+                
+                if (trimmed === 'true' || trimmed === 'false') {
+                    value = trimmed === 'true';
+                } else {
+                    value = input;
+                }
+                
+                await booleanValidator.assert(value);
+                resultDiv.className = 'result valid';
+                resultDiv.textContent = `✅ Boolean assertion passed: "${input}"`;
+            } catch (error) {
+                if (error instanceof ValidationError) {
+                    resultDiv.className = 'result invalid';
+                    resultDiv.textContent = `❌ ${error.message}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                    console.error('Assertion error:', error);
+                }
+            }
+        };
+        
+        // DateTime Validator functions
+        window.testDateTimeValidation = async function() {
+            const input = document.getElementById('datetimeInput').value;
+            const resultDiv = document.getElementById('datetimeResult');
+            
+            try {
+                const isValid = await datetimeValidator.validate(input);
+                resultDiv.className = `result ${isValid ? 'valid' : 'invalid'}`;
+                resultDiv.textContent = isValid 
+                    ? `✅ Valid ISO8601 datetime: "${input}"` 
+                    : `❌ Invalid ISO8601 datetime: "${input}"`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                console.error('Validation error:', error);
+            }
+        };
+        
+        window.testDateTimeAssertion = async function() {
+            const input = document.getElementById('datetimeInput').value;
+            const resultDiv = document.getElementById('datetimeResult');
+            
+            try {
+                await datetimeValidator.assert(input);
+                resultDiv.className = 'result valid';
+                resultDiv.textContent = `✅ DateTime assertion passed: "${input}"`;
+            } catch (error) {
+                if (error instanceof ValidationError) {
+                    resultDiv.className = 'result invalid';
+                    resultDiv.textContent = `❌ ${error.message}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                    console.error('Assertion error:', error);
+                }
+            }
+        };
+        
+        // Date Validator functions
+        window.testDateValidation = async function() {
+            const input = document.getElementById('dateInput').value;
+            const resultDiv = document.getElementById('dateResult');
+            
+            try {
+                const isValid = await dateValidator.validate(input);
+                resultDiv.className = `result ${isValid ? 'valid' : 'invalid'}`;
+                resultDiv.textContent = isValid 
+                    ? `✅ Valid ISO8601 date: "${input}"` 
+                    : `❌ Invalid ISO8601 date: "${input}"`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                console.error('Validation error:', error);
+            }
+        };
+        
+        window.testDateAssertion = async function() {
+            const input = document.getElementById('dateInput').value;
+            const resultDiv = document.getElementById('dateResult');
+            
+            try {
+                await dateValidator.assert(input);
+                resultDiv.className = 'result valid';
+                resultDiv.textContent = `✅ Date assertion passed: "${input}"`;
+            } catch (error) {
+                if (error instanceof ValidationError) {
+                    resultDiv.className = 'result invalid';
+                    resultDiv.textContent = `❌ ${error.message}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                    console.error('Assertion error:', error);
+                }
+            }
+        };
+        
+        // Time Validator functions
+        window.testTimeValidation = async function() {
+            const input = document.getElementById('timeInput').value;
+            const resultDiv = document.getElementById('timeResult');
+            
+            try {
+                const isValid = await timeValidator.validate(input);
+                resultDiv.className = `result ${isValid ? 'valid' : 'invalid'}`;
+                resultDiv.textContent = isValid 
+                    ? `✅ Valid ISO8601 time: "${input}"` 
+                    : `❌ Invalid ISO8601 time: "${input}"`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                console.error('Validation error:', error);
+            }
+        };
+        
+        window.testTimeAssertion = async function() {
+            const input = document.getElementById('timeInput').value;
+            const resultDiv = document.getElementById('timeResult');
+            
+            try {
+                await timeValidator.assert(input);
+                resultDiv.className = 'result valid';
+                resultDiv.textContent = `✅ Time assertion passed: "${input}"`;
+            } catch (error) {
+                if (error instanceof ValidationError) {
+                    resultDiv.className = 'result invalid';
+                    resultDiv.textContent = `❌ ${error.message}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `⚠️ Error: ${error.message}`;
+                    console.error('Assertion error:', error);
+                }
+            }
+        };
+        
+        window.runAllTests = async function() {
+            const textTestCases = [
+                // Valid text cases
+                { input: "Hello, World!", expected: true, description: "Normal text" },
+                { input: "Test 123", expected: true, description: "Text with numbers" },
+                { input: "Multi\nline\ntext", expected: true, description: "Multiline text" },
+                { input: "Special: @#$%^&*()", expected: true, description: "Special characters" },
+                { input: "Émoji text 🎉", expected: true, description: "Unicode and emoji" },
+                { input: "   Spaces around   ", expected: true, description: "Text with spaces" },
+                
+                // Invalid text cases
+                { input: "", expected: false, description: "Empty string" },
+                { input: "   ", expected: false, description: "Only spaces" },
+                { input: "\t\n\r", expected: false, description: "Only whitespace" },
+                { input: "    \t    ", expected: false, description: "Mixed whitespace" }
+            ];
+            
+            const urlTestCases = [
+                // Valid URL cases
+                { input: "http://example.com", expected: true, description: "HTTP URL" },
+                { input: "https://www.google.com", expected: true, description: "HTTPS with www" },
+                { input: "https://example.com/path?q=test", expected: true, description: "URL with path and query" },
+                { input: "ftp://files.example.com", expected: true, description: "FTP URL" },
+                { input: "mailto:user@example.com", expected: true, description: "Mailto URL" },
+                { input: "http://localhost:3000", expected: true, description: "Localhost with port" },
+                { input: "https://192.168.1.1", expected: true, description: "IP address" },
+                { input: "data:text/plain,Hello", expected: true, description: "Data URL" },
+                
+                // Invalid URL cases
+                { input: "", expected: false, description: "Empty string" },
+                { input: "not a url", expected: false, description: "Plain text" },
+                { input: "example.com", expected: false, description: "Missing scheme" },
+                { input: "http://", expected: false, description: "No host" },
+                { input: "xyz://example.com", expected: false, description: "Invalid scheme" }
+            ];
+            
+            const integerTestCases = [
+                // Valid integer cases - numbers
+                { input: 42, expected: true, description: "Positive integer" },
+                { input: 0, expected: true, description: "Zero" },
+                { input: -42, expected: true, description: "Negative integer" },
+                { input: 1000000, expected: true, description: "Large integer" },
+                
+                // Valid integer cases - strings
+                { input: "42", expected: true, description: "String integer" },
+                { input: "0", expected: true, description: "String zero" },
+                { input: "-42", expected: true, description: "String negative" },
+                { input: "  123  ", expected: true, description: "String with spaces" },
+                { input: "+42", expected: true, description: "String with plus sign" },
+                
+                // Invalid cases - floats
+                { input: 42.5, expected: false, description: "Float number" },
+                { input: 0.1, expected: false, description: "Decimal" },
+                { input: "42.5", expected: false, description: "String float" },
+                { input: "3.14", expected: false, description: "String pi" },
+                
+                // Invalid cases - non-numeric
+                { input: "", expected: false, description: "Empty string" },
+                { input: "not a number", expected: false, description: "Plain text" },
+                { input: "12abc", expected: false, description: "Mixed text" },
+                { input: true, expected: false, description: "Boolean" },
+                { input: null, expected: false, description: "Null" }
+            ];
+            
+            const floatTestCases = [
+                // Valid float cases - numbers
+                { input: 3.14, expected: true, description: "Pi" },
+                { input: 0.0, expected: true, description: "Zero float" },
+                { input: -3.14, expected: true, description: "Negative float" },
+                { input: 1.23e10, expected: true, description: "Scientific notation" },
+                { input: 42, expected: true, description: "Integer as float" },
+                { input: 0.1, expected: true, description: "Small decimal" },
+                
+                // Valid float cases - strings
+                { input: "3.14", expected: true, description: "String float" },
+                { input: "0.0", expected: true, description: "String zero float" },
+                { input: "-3.14", expected: true, description: "String negative float" },
+                { input: "1.23e10", expected: true, description: "String scientific" },
+                { input: "42", expected: true, description: "String integer" },
+                { input: "  3.14  ", expected: true, description: "String with spaces" },
+                { input: "+3.14", expected: true, description: "String with plus" },
+                { input: ".5", expected: true, description: "No leading zero" },
+                { input: "5.", expected: true, description: "No trailing zero" },
+                
+                // Invalid cases
+                { input: "NaN", expected: false, description: "Not a Number" },
+                { input: "Infinity", expected: false, description: "Infinity" },
+                { input: "-Infinity", expected: false, description: "Negative Infinity" },
+                { input: "", expected: false, description: "Empty string" },
+                { input: "not a number", expected: false, description: "Plain text" },
+                { input: "12.34.56", expected: false, description: "Multiple decimals" },
+                { input: true, expected: false, description: "Boolean" },
+                { input: null, expected: false, description: "Null" }
+            ];
+            
+            const booleanTestCases = [
+                // Valid boolean cases - direct booleans
+                { input: true, expected: true, description: "Boolean true" },
+                { input: false, expected: true, description: "Boolean false" },
+                
+                // Valid boolean cases - strings
+                { input: "true", expected: true, description: "String true" },
+                { input: "false", expected: true, description: "String false" },
+                { input: "True", expected: true, description: "String True" },
+                { input: "FALSE", expected: true, description: "String FALSE" },
+                { input: "yes", expected: true, description: "String yes" },
+                { input: "no", expected: true, description: "String no" },
+                { input: "on", expected: true, description: "String on" },
+                { input: "off", expected: true, description: "String off" },
+                { input: "y", expected: true, description: "String y" },
+                { input: "n", expected: true, description: "String n" },
+                { input: "1", expected: true, description: "String 1" },
+                { input: "0", expected: true, description: "String 0" },
+                
+                // Valid boolean cases - numbers
+                { input: 1, expected: true, description: "Number 1" },
+                { input: 0, expected: true, description: "Number 0" },
+                
+                // Invalid cases
+                { input: "", expected: false, description: "Empty string" },
+                { input: "maybe", expected: false, description: "String maybe" },
+                { input: "2", expected: false, description: "String 2" },
+                { input: 2, expected: false, description: "Number 2" },
+                { input: 0.5, expected: false, description: "Number 0.5" },
+                { input: null, expected: false, description: "Null" },
+                { input: {}, expected: false, description: "Object" },
+                { input: [], expected: false, description: "Array" }
+            ];
+            
+            const datetimeTestCases = [
+                // Valid ISO8601 datetimes
+                { input: "2024-03-14T15:30:00Z", expected: true, description: "Standard ISO8601 with Z" },
+                { input: "2024-12-31T23:59:59Z", expected: true, description: "End of year" },
+                { input: "2024-01-01T00:00:00Z", expected: true, description: "Start of year" },
+                { input: "2024-03-14T15:30:00.123Z", expected: true, description: "With milliseconds" },
+                { input: "2024-03-14T15:30:00+00:00", expected: true, description: "With timezone offset +00:00" },
+                { input: "2024-03-14T15:30:00-05:00", expected: true, description: "With timezone offset -05:00" },
+                { input: "2024-03-14T15:30:00+05:30", expected: true, description: "With timezone offset +05:30" },
+                { input: "2024-02-29T12:00:00Z", expected: true, description: "Leap year date" },
+                { input: "2024-03-14t15:30:00Z", expected: true, description: "Lowercase T separator" },
+                { input: "2024-03-14T15:30:00.123456789Z", expected: true, description: "With nanoseconds" },
+                
+                // Invalid ISO8601 datetimes
+                { input: "2024-03-14", expected: false, description: "Date only" },
+                { input: "15:30:00Z", expected: false, description: "Time only" },
+                { input: "2024-03-14 15:30:00Z", expected: false, description: "Space instead of T" },
+                { input: "2024-03-14T15:30:00", expected: false, description: "No timezone" },
+                { input: "2024-13-01T00:00:00Z", expected: false, description: "Invalid month (13)" },
+                { input: "2024-03-32T00:00:00Z", expected: false, description: "Invalid day (32)" },
+                { input: "2024-02-30T00:00:00Z", expected: false, description: "Invalid date (Feb 30)" },
+                { input: "2023-02-29T00:00:00Z", expected: false, description: "Invalid leap year date" },
+                { input: "2024-03-14T24:00:00Z", expected: false, description: "Invalid hour (24)" },
+                { input: "2024-03-14T15:60:00Z", expected: false, description: "Invalid minute (60)" },
+                { input: "", expected: false, description: "Empty string" },
+                { input: "not a date", expected: false, description: "Random text" }
+            ];
+            
+            const dateTestCases = [
+                // Valid ISO8601 dates
+                { input: "2024-03-14", expected: true, description: "Standard date" },
+                { input: "2024-12-31", expected: true, description: "End of year" },
+                { input: "2024-01-01", expected: true, description: "Start of year" },
+                { input: "2024-02-29", expected: true, description: "Leap year Feb 29" },
+                { input: "2000-02-29", expected: true, description: "Century leap year" },
+                { input: "2024-01-31", expected: true, description: "January 31" },
+                { input: "2024-04-30", expected: true, description: "April 30" },
+                { input: "0000-01-01", expected: true, description: "Year 0000" },
+                { input: "9999-12-31", expected: true, description: "Year 9999" },
+                
+                // Invalid ISO8601 dates
+                { input: "2024-13-01", expected: false, description: "Invalid month (13)" },
+                { input: "2024-00-01", expected: false, description: "Invalid month (0)" },
+                { input: "2024-03-32", expected: false, description: "Invalid day (32)" },
+                { input: "2024-03-00", expected: false, description: "Invalid day (0)" },
+                { input: "2024-02-30", expected: false, description: "Feb 30" },
+                { input: "2024-04-31", expected: false, description: "Apr 31" },
+                { input: "2023-02-29", expected: false, description: "Non-leap year Feb 29" },
+                { input: "1900-02-29", expected: false, description: "Century non-leap year" },
+                { input: "24-03-14", expected: false, description: "2-digit year" },
+                { input: "2024-3-14", expected: false, description: "1-digit month" },
+                { input: "2024-03-4", expected: false, description: "1-digit day" },
+                { input: "2024/03/14", expected: false, description: "Wrong separator" },
+                { input: "03/14/2024", expected: false, description: "US format" },
+                { input: "2024-03-14T00:00:00Z", expected: false, description: "Date with time" },
+                { input: "", expected: false, description: "Empty string" },
+                { input: "not a date", expected: false, description: "Random text" }
+            ];
+            
+            const timeTestCases = [
+                // Valid ISO8601 times
+                { input: "12:30:45", expected: true, description: "Standard time" },
+                { input: "00:00:00", expected: true, description: "Midnight" },
+                { input: "23:59:59", expected: true, description: "Last second of day" },
+                { input: "12:30:45Z", expected: true, description: "Time with Z timezone" },
+                { input: "12:30:45.123", expected: true, description: "Time with milliseconds" },
+                { input: "12:30:45.999999999", expected: true, description: "Time with nanoseconds" },
+                { input: "12:30:45+00:00", expected: true, description: "Time with +00:00 offset" },
+                { input: "12:30:45-05:00", expected: true, description: "Time with -05:00 offset" },
+                { input: "12:30:45+14:00", expected: true, description: "Time with max offset" },
+                { input: "23:59:60", expected: true, description: "Leap second" },
+                
+                // Invalid ISO8601 times
+                { input: "24:00:00", expected: false, description: "Invalid hour (24)" },
+                { input: "12:60:00", expected: false, description: "Invalid minute (60)" },
+                { input: "12:30:61", expected: false, description: "Invalid second (61)" },
+                { input: "1:30:45", expected: false, description: "1-digit hour" },
+                { input: "12:3:45", expected: false, description: "1-digit minute" },
+                { input: "12:30:4", expected: false, description: "1-digit second" },
+                { input: "12:30", expected: false, description: "Missing seconds" },
+                { input: "12:30:45.", expected: false, description: "Dot without fraction" },
+                { input: "12:30:45+1:00", expected: false, description: "1-digit hour in offset" },
+                { input: "12:30:45+15:00", expected: false, description: "Offset too large" },
+                { input: "2024-03-14T12:30:45Z", expected: false, description: "Time with date" },
+                { input: "", expected: false, description: "Empty string" },
+                { input: "not a time", expected: false, description: "Random text" }
+            ];
+            
+            const testCasesDiv = document.getElementById('testCases');
+            testCasesDiv.innerHTML = '';
+            
+            let totalPassed = 0;
+            let totalFailed = 0;
+            
+            // Test Text Validator
+            const textHeader = document.createElement('h3');
+            textHeader.textContent = 'Text Validator Tests:';
+            testCasesDiv.appendChild(textHeader);
+            
+            for (const testCase of textTestCases) {
+                try {
+                    const result = await textValidator.validate(testCase.input);
+                    const success = result === testCase.expected;
+                    
+                    if (success) totalPassed++;
+                    else totalFailed++;
+                    
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = `test-case ${success ? 'pass' : 'fail'}`;
+                    caseDiv.innerHTML = `
+                        <span>${success ? '✅' : '❌'} ${testCase.description}: "${testCase.input || '(empty)'}"</span>
+                        <span>Expected: ${testCase.expected}, Got: ${result}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                } catch (error) {
+                    totalFailed++;
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = 'test-case fail';
+                    caseDiv.innerHTML = `
+                        <span>⚠️ ${testCase.description}: Error</span>
+                        <span>${error.message}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                }
+            }
+            
+            // Test URL Validator
+            const urlHeader = document.createElement('h3');
+            urlHeader.textContent = 'URL Validator Tests:';
+            urlHeader.style.marginTop = '20px';
+            testCasesDiv.appendChild(urlHeader);
+            
+            for (const testCase of urlTestCases) {
+                try {
+                    const result = await urlValidator.validate(testCase.input);
+                    const success = result === testCase.expected;
+                    
+                    if (success) totalPassed++;
+                    else totalFailed++;
+                    
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = `test-case ${success ? 'pass' : 'fail'}`;
+                    caseDiv.innerHTML = `
+                        <span>${success ? '✅' : '❌'} ${testCase.description}: "${testCase.input || '(empty)'}"</span>
+                        <span>Expected: ${testCase.expected}, Got: ${result}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                } catch (error) {
+                    totalFailed++;
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = 'test-case fail';
+                    caseDiv.innerHTML = `
+                        <span>⚠️ ${testCase.description}: Error</span>
+                        <span>${error.message}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                }
+            }
+            
+            // Test Integer Validator
+            const integerHeader = document.createElement('h3');
+            integerHeader.textContent = 'Integer Validator Tests:';
+            integerHeader.style.marginTop = '20px';
+            testCasesDiv.appendChild(integerHeader);
+            
+            for (const testCase of integerTestCases) {
+                try {
+                    const result = await integerValidator.validate(testCase.input);
+                    const success = result === testCase.expected;
+                    
+                    if (success) totalPassed++;
+                    else totalFailed++;
+                    
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = `test-case ${success ? 'pass' : 'fail'}`;
+                    const displayValue = testCase.input === null ? 'null' : 
+                                       testCase.input === "" ? '(empty)' :
+                                       typeof testCase.input === 'boolean' ? String(testCase.input) :
+                                       testCase.input;
+                    caseDiv.innerHTML = `
+                        <span>${success ? '✅' : '❌'} ${testCase.description}: "${displayValue}"</span>
+                        <span>Expected: ${testCase.expected}, Got: ${result}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                } catch (error) {
+                    totalFailed++;
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = 'test-case fail';
+                    caseDiv.innerHTML = `
+                        <span>⚠️ ${testCase.description}: Error</span>
+                        <span>${error.message}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                }
+            }
+            
+            // Test FloatingPoint Validator
+            const floatHeader = document.createElement('h3');
+            floatHeader.textContent = 'FloatingPoint Validator Tests:';
+            floatHeader.style.marginTop = '20px';
+            testCasesDiv.appendChild(floatHeader);
+            
+            for (const testCase of floatTestCases) {
+                try {
+                    const result = await floatValidator.validate(testCase.input);
+                    const success = result === testCase.expected;
+                    
+                    if (success) totalPassed++;
+                    else totalFailed++;
+                    
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = `test-case ${success ? 'pass' : 'fail'}`;
+                    const displayValue = testCase.input === null ? 'null' : 
+                                       testCase.input === "" ? '(empty)' :
+                                       typeof testCase.input === 'boolean' ? String(testCase.input) :
+                                       testCase.input;
+                    caseDiv.innerHTML = `
+                        <span>${success ? '✅' : '❌'} ${testCase.description}: "${displayValue}"</span>
+                        <span>Expected: ${testCase.expected}, Got: ${result}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                } catch (error) {
+                    totalFailed++;
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = 'test-case fail';
+                    caseDiv.innerHTML = `
+                        <span>⚠️ ${testCase.description}: Error</span>
+                        <span>${error.message}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                }
+            }
+            
+            // Boolean validation tests
+            testCasesDiv.appendChild(document.createElement('br'));
+            const booleanTitle = document.createElement('h3');
+            booleanTitle.textContent = 'Boolean Validation Tests:';
+            testCasesDiv.appendChild(booleanTitle);
+            
+            for (const testCase of booleanTestCases) {
+                try {
+                    const result = await booleanValidator.validate(testCase.input);
+                    const success = result === testCase.expected;
+                    if (success) totalPassed++;
+                    else totalFailed++;
+                    
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = `test-case ${success ? 'pass' : 'fail'}`;
+                    const displayValue = testCase.input === null ? 'null' :
+                                       testCase.input === "" ? '(empty)' :
+                                       typeof testCase.input === 'boolean' ? String(testCase.input) :
+                                       testCase.input;
+                    caseDiv.innerHTML = `
+                        <span>${success ? '✅' : '❌'} ${testCase.description}: "${displayValue}"</span>
+                        <span>Expected: ${testCase.expected}, Got: ${result}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                } catch (error) {
+                    totalFailed++;
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = 'test-case fail';
+                    caseDiv.innerHTML = `
+                        <span>⚠️ ${testCase.description}: Error</span>
+                        <span>${error.message}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                }
+            }
+            
+            // DateTime validation tests
+            testCasesDiv.appendChild(document.createElement('br'));
+            const datetimeTitle = document.createElement('h3');
+            datetimeTitle.textContent = 'DateTime (ISO8601) Validation Tests:';
+            testCasesDiv.appendChild(datetimeTitle);
+            
+            for (const testCase of datetimeTestCases) {
+                try {
+                    const result = await datetimeValidator.validate(testCase.input);
+                    const success = result === testCase.expected;
+                    if (success) totalPassed++;
+                    else totalFailed++;
+                    
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = `test-case ${success ? 'pass' : 'fail'}`;
+                    const displayValue = testCase.input === null ? 'null' :
+                                       testCase.input === "" ? '(empty)' :
+                                       testCase.input;
+                    caseDiv.innerHTML = `
+                        <span>${success ? '✅' : '❌'} ${testCase.description}: "${displayValue}"</span>
+                        <span>Expected: ${testCase.expected}, Got: ${result}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                } catch (error) {
+                    totalFailed++;
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = 'test-case fail';
+                    caseDiv.innerHTML = `
+                        <span>⚠️ ${testCase.description}: Error</span>
+                        <span>${error.message}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                }
+            }
+            
+            // Date validation tests
+            testCasesDiv.appendChild(document.createElement('br'));
+            const dateTitle = document.createElement('h3');
+            dateTitle.textContent = 'Date (ISO8601) Validation Tests:';
+            testCasesDiv.appendChild(dateTitle);
+            
+            for (const testCase of dateTestCases) {
+                try {
+                    const result = await dateValidator.validate(testCase.input);
+                    const success = result === testCase.expected;
+                    if (success) totalPassed++;
+                    else totalFailed++;
+                    
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = `test-case ${success ? 'pass' : 'fail'}`;
+                    const displayValue = testCase.input === null ? 'null' :
+                                       testCase.input === "" ? '(empty)' :
+                                       testCase.input;
+                    caseDiv.innerHTML = `
+                        <span>${success ? '✅' : '❌'} ${testCase.description}: "${displayValue}"</span>
+                        <span>Expected: ${testCase.expected}, Got: ${result}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                } catch (error) {
+                    totalFailed++;
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = 'test-case fail';
+                    caseDiv.innerHTML = `
+                        <span>⚠️ ${testCase.description}: Error</span>
+                        <span>${error.message}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                }
+            }
+            
+            // Time validation tests
+            testCasesDiv.appendChild(document.createElement('br'));
+            const timeTitle = document.createElement('h3');
+            timeTitle.textContent = 'Time (ISO8601) Validation Tests:';
+            testCasesDiv.appendChild(timeTitle);
+            
+            for (const testCase of timeTestCases) {
+                try {
+                    const result = await timeValidator.validate(testCase.input);
+                    const success = result === testCase.expected;
+                    if (success) totalPassed++;
+                    else totalFailed++;
+                    
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = `test-case ${success ? 'pass' : 'fail'}`;
+                    const displayValue = testCase.input === null ? 'null' :
+                                       testCase.input === "" ? '(empty)' :
+                                       testCase.input;
+                    caseDiv.innerHTML = `
+                        <span>${success ? '✅' : '❌'} ${testCase.description}: "${displayValue}"</span>
+                        <span>Expected: ${testCase.expected}, Got: ${result}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                } catch (error) {
+                    totalFailed++;
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = 'test-case fail';
+                    caseDiv.innerHTML = `
+                        <span>⚠️ ${testCase.description}: Error</span>
+                        <span>${error.message}</span>
+                    `;
+                    testCasesDiv.appendChild(caseDiv);
+                }
+            }
+            
+            const summaryDiv = document.createElement('div');
+            summaryDiv.style.marginTop = '20px';
+            summaryDiv.style.fontWeight = 'bold';
+            const totalTests = textTestCases.length + urlTestCases.length + integerTestCases.length + floatTestCases.length + booleanTestCases.length + datetimeTestCases.length + dateTestCases.length + timeTestCases.length;
+            summaryDiv.innerHTML = `Summary: ${totalPassed} passed, ${totalFailed} failed out of ${totalTests} tests`;
+            testCasesDiv.appendChild(summaryDiv);
+        };
+        
+        // Initialize on load
+        window.addEventListener('load', async () => {
+            try {
+                // Pre-load all validators
+                await Promise.all([
+                    textValidator.validate("test"),
+                    urlValidator.validate("http://test.com"),
+                    integerValidator.validate(42),
+                    floatValidator.validate(3.14),
+                    booleanValidator.validate(true),
+                    datetimeValidator.validate("2024-03-14T15:30:00Z"),
+                    dateValidator.validate("2024-03-14"),
+                    timeValidator.validate("12:30:45")
+                ]);
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('testCases').style.display = 'block';
+                
+                // Run tests automatically
+                await runAllTests();
+            } catch (error) {
+                document.getElementById('loading').innerHTML = 
+                    `<div class="error-message">Failed to load WASM modules: ${error.message}</div>`;
+                console.error('Failed to initialize:', error);
+            }
+        });
+    </script>
+</body>
+</html>
